@@ -14,11 +14,21 @@ for idx = 1:Nimages
     x = applyconvolve(x, conv1_filters, conv1_bias); % Layer 1
     x = applyrelu(x);                                % Layer 2
     x = applymaxpool(x);                             % Layer 3
-    % if more layers add here
-    
-    % When at final fully connected + softmax stage:
-    x = applyfullconnect(x, fc_filters, fc_bias);
-    x = applysoftmax(x);
+    x = applyconvolve(x, conv2_filters, conv2_bias); % Layer 4
+    x = applyrelu(x);                                % Layer 5
+    x = applymaxpool(x);                             % Layer 6
+    x = applyconvolve(x, conv3_filters, conv3_bias); % Layer 7
+    x = applyrelu(x);                                % Layer 8
+    x = applyconvolve(x, conv4_filters, conv4_bias); % Layer 9
+    x = applyrelu(x);                                % Layer 10
+    x = applymaxpool(x);                             % Layer 11
+    x = applyconvolve(x, conv5_filters, conv5_bias); % Layer 12
+    x = applyrelu(x);                                % Layer 13
+    x = applyconvolve(x, conv6_filters, conv6_bias); % Layer 14
+    x = applyrelu(x);                                % Layer 15
+    x = applymaxpool(x);                             % Layer 16
+    x = applyfullconnect(x, fc1_filters, fc1_bias);  % Layer 17
+    x = applysoftmax(x);                             % Layer 18
     
     predicted_probs(idx, :) = squeeze(x);
     [~, predicted_class(idx)] = max(x(:));
