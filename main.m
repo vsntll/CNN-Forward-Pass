@@ -3,11 +3,11 @@ load('cifar10testdata.mat');      % loads imageset, trueclass, classlabels
 load('CNNparameters.mat');        % loads all filters and biases for layers
 
 Nimages = size(imageset, 4);
-predicted_probs = zeros(Nimages, length(classlabels));
-predicted_class = zeros(1, Nimages);
+num_classes = length(classlabels);
+confmat = zeros(num_classes, num_classes);
 
-for idx = 1:Nimages
-    x = imageset(:, :, :, idx);                  % NxMx3 uint8 image
+for d = 1:length(layertypes)
+    x = imageset(:, :, :, d);                  % NxMx3 uint8 image
     x = applyimnormalize(x);                     % Layer 1
     
     % Example for two layers; expand sequence for all 18 layers
@@ -29,26 +29,43 @@ for idx = 1:Nimages
     x = applyfullconnect(x, filterbanks{17}, biasvectors{17});  % Layer 17
     x = applysoftmax(x);                             % Layer 18
     
-    predicted_probs(idx, :) = squeeze(x);
-    [~, predicted_class(idx)] = max(x(:));
+   fprintf('layer %d is of type %s\n',d,layertypes{d});
+    filterbank = filterbanks{d};
+    if not(isempty(filterbank))
+        fprintf('filterbank size %d x %d x %d x %d\n', ...
+            size(filterbank,1),size(filterbank,2), ...
+            size(filterbank,3),size(filterbank,4));
+        biasvec = biasvectors{d};
+        fprintf(' number of biases is %d\n',length(biasvec));
+    end
+
+    % Extract class probabilities vector
+    classprobvec = squeeze(x);
+    [~, maxclass] = max(classprobvec);
+    
+    % Update confusion matrix
+    confmat(trueclass(d), maxclass) = confmat(trueclass(d), maxclass) + 1;
 end
 
-% Inputs:
-% trueclass: 1xN vector of true class labels (1 to 10)
-% predicted_class: 1xN vector of predicted class labels (1 to 10)    
-num_classes = length(unique(trueclass)); % usually 10 for CIFAR-10
-confmat = zeros(num_classes, num_classes);
-
-for i = 1:length(trueclass)
-    true_idx = trueclass(i);
-    pred_idx = predicted_class(i);
-    confmat(true_idx, pred_idx) = confmat(true_idx, pred_idx) + 1;
+%loading this file defines imrgb and layerResults
+load 'debuggingTest.mat'
+%sample code to show image and access expected results
+figure; imagesc(imrgb); truesize(gcf,[64 64]);
+for d = 1:length(layerResults)
+    result = layerResults{d};
+    fprintf('layer %d output is size %d x %d x %d\n',...
+        d,size(result,1),size(result,2), size(result,3));
 end
+%find most probable class
+classprobvec = squeeze(layerResults{end});
+[maxprob,maxclass] = max(classprobvec);
+%note, classlabels is defined in ’cifar10testdata.mat’
+fprintf('estimated class is %s with probability %.4f\n',...
+    classlabels{maxclass},maxprob);
 
-% Display confusion matrix
+
 disp('Confusion Matrix:');
 disp(confmat);
 
-% Calculate accuracy
 accuracy = sum(diag(confmat)) / sum(confmat(:));
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
