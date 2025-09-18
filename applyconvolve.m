@@ -9,7 +9,7 @@ for l = 1:D2
     temp = zeros(N, M);
     for k = 1:D1
         filt = squeeze(filterbank(:, :, k, l));
-        temp = temp + imfilter(inarray(:, :, k), filt, 'conv', 'same', 'zeros');
+        temp = temp + imfilter(inarray(:, :, k), filt, 'conv', 'same');
     end
     outarray(:, :, l) = temp + biasvals(l);
 end
