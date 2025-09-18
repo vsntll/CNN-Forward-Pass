@@ -3,8 +3,8 @@ load('cifar10testdata.mat');      % loads imageset, trueclass, classlabels
 load('CNNparameters.mat');        % loads all filters and biases for layers
 
 Nimages = size(imageset, 4);
-predicted_probs = zeros(Nimages, length(classlabels));
-predicted_class = zeros(1, Nimages);
+num_classes = length(classlabels);
+confmat = zeros(num_classes, num_classes);
 
 for d = 1:length(layertypes)
     x = imageset(:, :, :, d);                  % NxMx3 uint8 image
@@ -38,6 +38,13 @@ for d = 1:length(layertypes)
         biasvec = biasvectors{d};
         fprintf(' number of biases is %d\n',length(biasvec));
     end
+
+    % Extract class probabilities vector
+    classprobvec = squeeze(x);
+    [~, maxclass] = max(classprobvec);
+    
+    % Update confusion matrix
+    confmat(trueclass(d), maxclass) = confmat(trueclass(d), maxclass) + 1;
 end
 
 %loading this file defines imrgb and layerResults
@@ -56,22 +63,9 @@ classprobvec = squeeze(layerResults{end});
 fprintf('estimated class is %s with probability %.4f\n',...
     classlabels{maxclass},maxprob);
 
-% Inputs:
-% trueclass: 1xN vector of true class labels (1 to 10)
-% predicted_class: 1xN vector of predicted class labels (1 to 10)    
-num_classes = length(unique(trueclass)); % usually 10 for CIFAR-10
-confmat = zeros(num_classes, num_classes);
 
-for i = 1:length(trueclass)
-    true_idx = trueclass(i);
-    pred_idx = predicted_class(i);
-    confmat(true_idx, pred_idx) = confmat(true_idx, pred_idx) + 1;
-end
-
-% Display confusion matrix
 disp('Confusion Matrix:');
 disp(confmat);
 
-% Calculate accuracy
 accuracy = sum(diag(confmat)) / sum(confmat(:));
 fprintf('Accuracy: %.2f%%\n', accuracy * 100);
