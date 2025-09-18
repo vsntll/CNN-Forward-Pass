@@ -11,22 +11,22 @@ for idx = 1:Nimages
     x = applyimnormalize(x);                     % Layer 1
     
     % Example for two layers; expand sequence for all 18 layers
-    x = applyconvolve(x, conv1_filters, conv1_bias); % Layer 2
+    x = applyconvolve(x, filterbanks{2}, biasvectors{2}); % Layer 2
     x = applyrelu(x);                                % Layer 3
-    x = applyconvolve(x, conv2_filters, conv2_bias); % Layer 4
+    x = applyconvolve(x, filterbanks{4}, biasvectors{4}); % Layer 4
     x = applyrelu(x);                                % Layer 5
     x = applymaxpool(x);                             % Layer 6
-    x = applyconvolve(x, conv3_filters, conv3_bias); % Layer 7
+    x = applyconvolve(x, filterbanks{7}, biasvectors{7}); % Layer 7
     x = applyrelu(x);                                % Layer 8
-    x = applyconvolve(x, conv4_filters, conv4_bias); % Layer 9
+    x = applyconvolve(x, filterbanks{9}, biasvectors{9}); % Layer 9
     x = applyrelu(x);                                % Layer 10
     x = applymaxpool(x);                             % Layer 11
-    x = applyconvolve(x, conv5_filters, conv5_bias); % Layer 12
+    x = applyconvolve(x, filterbanks{12}, biasvectors{12}); % Layer 12
     x = applyrelu(x);                                % Layer 13
-    x = applyconvolve(x, conv6_filters, conv6_bias); % Layer 14
+    x = applyconvolve(x, filterbanks{14}, biasvectors{14}); % Layer 14
     x = applyrelu(x);                                % Layer 15
     x = applymaxpool(x);                             % Layer 16
-    x = applyfullconnect(x, fc1_filters, fc1_bias);  % Layer 17
+    x = applyfullconnect(x, filterbanks{17}, biasvectors{17});  % Layer 17
     x = applysoftmax(x);                             % Layer 18
     
     predicted_probs(idx, :) = squeeze(x);
