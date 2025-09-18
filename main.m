@@ -55,3 +55,23 @@ classprobvec = squeeze(layerResults{end});
 %note, classlabels is defined in ’cifar10testdata.mat’
 fprintf('estimated class is %s with probability %.4f\n',...
     classlabels{maxclass},maxprob);
+
+% Inputs:
+% trueclass: 1xN vector of true class labels (1 to 10)
+% predicted_class: 1xN vector of predicted class labels (1 to 10)    
+num_classes = length(unique(trueclass)); % usually 10 for CIFAR-10
+confmat = zeros(num_classes, num_classes);
+
+for i = 1:length(trueclass)
+    true_idx = trueclass(i);
+    pred_idx = predicted_class(i);
+    confmat(true_idx, pred_idx) = confmat(true_idx, pred_idx) + 1;
+end
+
+% Display confusion matrix
+disp('Confusion Matrix:');
+disp(confmat);
+
+% Calculate accuracy
+accuracy = sum(diag(confmat)) / sum(confmat(:));
+fprintf('Accuracy: %.2f%%\n', accuracy * 100);
