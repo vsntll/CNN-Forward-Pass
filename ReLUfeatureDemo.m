@@ -1,50 +1,49 @@
-% Load the sample test image from local directory
-load('cifar10testdata.mat'); % assumes variable 'testimages' of size HxWx3xN
-sampleImg = imageset(:, :, :, 1);; % Use first test image, unnormalized for now
+% demo.m -- CNN demonstration for CMPENEE 454 Project 1
+% Loads the sample image and parameters and walks through the 18-layer pipeline
 
-% Normalize input image (output same size)
-normImg = applyimnormalize(sampleImg);
+load('debuggingTest.mat');   % Loads sample image imrgb
+load('CNNparameters.mat');   % Loads layertypes, filterbanks, biasvectors
+load('cifar10testdata.mat'); % Loads classlabels
 
-% Load filterbanks and bias vectors for CNN layers
-params = load('CNNparameters.mat'); 
-filterbanks = params.filterbanks;
-biasvectors = params.biasvectors;
+figure; imagesc(imrgb); truesize(gcf, [64 64]);
+title('Input Image'); drawnow;
 
-% Layer 1: Convolution (pass filterbank and bias vector)
-conv1Out = applyconvolve(normImg, filterbanks{2}, biasvectors{2});
-
-% ReLU activation
-relu1Out = applyrelu(conv1Out);
-
-% Layer 2: Max pooling
-pool2Out = applymaxpool(relu1Out);
-
-% Layer 3: Convolution + ReLU
-conv3Out = applyconvolve(pool2Out, filterbanks{4}, biasvectors{4});
-relu3Out = applyrelu(conv3Out);
-
-% Visualize intermediate layer feature maps (relu3Out)
-numFeatures = size(relu3Out, 3);
-nCols = ceil(sqrt(numFeatures));
-nRows = ceil(numFeatures / nCols);
-
-figure('Name', 'Layer 3 ReLU Feature Maps');
-for i = 1:numFeatures
-    subplot(nRows, nCols, i);
-    imshow(mat2gray(relu3Out(:,:,i)));
-    title(sprintf('Feature %d', i));
+data = imrgb;
+for d = 1:length(layertypes)
+    switch layertypes{d}
+        case 'imnormalize'
+            data = applyimnormalize(data);
+        case 'convolve'
+            data = applyconvolve(data, filterbanks{d}, biasvectors{d});
+        case 'relu'
+            data = applyrelu(data);
+        case 'maxpool'
+            data = applymaxpool(data);
+        case 'fullconnect'
+            data = applyfullconnect(data, filterbanks{d}, biasvectors{d});
+        case 'softmax'
+            data = applysoftmax(data);
+    end
+    if ismember(layertypes{d}, {'convolve', 'relu', 'maxpool'})
+        sz = size(data);
+        numChannels = sz(3);
+        colMax = ceil(sqrt(numChannels));
+        rowMax = ceil(numChannels / colMax);
+        figure;
+        for ch = 1:numChannels
+            subplot(rowMax, colMax, ch);
+            imagesc(data(:,:,ch)); colormap gray; axis off;
+        end
+        sgtitle(sprintf('Layer %d: %s', d, layertypes{d}));
+    end
 end
 
-% Show dummy softmax output heatmap for demonstration (10 classes)
-dummySoftmax = rand(10,1);
-dummySoftmax = dummySoftmax / sum(dummySoftmax);
+finalProbs = squeeze(data);
+figure;
+bar(finalProbs);
+title('Predicted Class Probabilities'); 
+set(gca, 'XTickLabel', classlabels);
+ylabel('Probability');
 
-figure('Name', 'Dummy Softmax Output Heatmap');
-imagesc(dummySoftmax);
-colorbar;
-title('Dummy Softmax Output Heatmap');
-xlabel('Class Index');
-yticks([]);
-
-% Print message in console
-fprintf('Demo completed: Intermediate CNN features displayed and dummy softmax heatmap shown.\n');
+[maxprob, maxclass] = max(finalProbs);
+disp(['Predicted class: ' classlabels{maxclass} ', Probability: ' num2str(maxprob)]);
