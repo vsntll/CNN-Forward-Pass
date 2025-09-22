@@ -37,7 +37,7 @@ Uses the CIFAR-10 dataset containing 32x32 color images categorized into 10 clas
    - `cifar10testdata.mat` for test images and labels.
    - `CNNparameters.mat` containing filter banks and biases.
 
-2. Implement or use provided layer functions:
+2. Key layer functions:
    - `applyimnormalize.m`
    - `applyconvolve.m`
    - `applyrelu.m`
@@ -45,17 +45,15 @@ Uses the CIFAR-10 dataset containing 32x32 color images categorized into 10 clas
    - `applyfullconnect.m`
    - `applysoftmax.m`
 
-3. Create a main script to sequentially apply each CNN layer function using the supplied parameters on an input image.
+3. Run the main script on test images to produce classification probabilities.
 
-4. Run the main script on test images to produce classification probabilities.
-
-5. Optionally run evaluation scripts to compute classification accuracy and confusion matrices over the test set.
+4. Run evaluation scripts to compute classification accuracy and confusion matrices over the test set.
 
 ## Installation
 
 Requires Matlab with the Image Processing Toolbox (for `imfilter` function).
 
-No additional toolboxes (Computer Vision, Neural Network, or Deep Learning toolbox) or third-party CNN libraries are permitted.
+No additional toolboxes (Computer Vision, Neural Network, or Deep Learning toolbox) or third-party CNN libraries are utilized.
 
 ## Evaluation
 
