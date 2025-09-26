@@ -26,6 +26,7 @@ for d = 1:length(layertypes)
     end
     if ismember(layertypes{d}, {'convolve', 'relu', 'maxpool'})
         sz = size(data);
+        s=size(data(:,:,1));
         numChannels = sz(3);
         colMax = ceil(sqrt(numChannels));
         rowMax = ceil(numChannels / colMax);
@@ -34,7 +35,7 @@ for d = 1:length(layertypes)
             subplot(rowMax, colMax, ch);
             imagesc(data(:,:,ch)); colormap gray; axis off;
         end
-        sgtitle(sprintf('Layer %d: %s', d, layertypes{d}));
+        sgtitle(sprintf('Layer %d: %s size: %d x %d', d, layertypes{d}, s(1), s(2)));
     end
 end
 
