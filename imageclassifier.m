@@ -50,7 +50,21 @@ function classify_unknown_images(folder_path, threshold)
                     error('Unknown layer type: %s', layertypes{layer_idx});
             end
         end
-    
+        
+        % Output probabilities vector (1x1x10);
+        probabilities = squeeze(cur_layer);
+
+        % Classification
+        [max_prob, class_idx] = max(probabilities);
+        if max_prob < threshold
+            fprintf('Image %s classified as UNKNOWN with max probability %.3f\n', image_name, max_prob);
+        else 
+            fprintf('Image %s classified as class %d with probability %d, %.3f\n', image_name, class_idc, max_prob);
+        end
+    end
+end
+
+
     
     
     
