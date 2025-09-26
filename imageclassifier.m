@@ -22,4 +22,39 @@ function classify_unknown_images(folder_path, threshold)
         image_name = image_files(k).name;
         image_path = fullfile(folder_path, image_name);
 
-        
+        % Read and resize image to the specs in desc. (32x32x3)
+        im_rgb = imread(image_path)
+        im_rgb_resized = imresize(im_rgb, [32 32]);
+
+        % Normalize
+        im_norm = applyimnormalize(im_rgb_resized);
+
+
+        % FW pass through the CNN layers
+        cur_layer = im_norm
+        for layer_idx = 1:length(layertypes)
+            switch layertypes{layer_idx}
+                case 'imnormalize'
+                    cur_layer = cur_layer %already normalized doesn't make sense
+                case 'convolve'
+                    cur_layer = applyconvolve(cur_layer, filterbanks{layer_idx}, biasvectors{layers_idx});
+                case 'relu'
+                    cur_layer = applyrelu(cur_layer);
+                case 'maxpool'
+                    cur_layer = maxpool(cur_layer);
+                case 'fullconnect'
+                    cur_layer = applyfullconnect(cur_layer, filterbanks{layer_idx}, biasvectors{layer_idx});
+                case 'softmax'
+                    cur_layer = applysoftmax(cur_layer);
+                otherwise
+                    error('Unknown layer type: %s', layertypes{layer_idx});
+            end
+        end
+    
+    
+    
+    
+    
+    
+    
+    end
