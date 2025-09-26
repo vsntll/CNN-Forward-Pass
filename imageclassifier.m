@@ -1,6 +1,6 @@
-classify_unknown_images('ImagePool', '0.5')
+classify_unknown_images('ImagePool')
 
-function classify_unknown_images(folder_path, threshold)
+function classify_unknown_images(folder_path)
     %Classify all images within the specified folder with an unknown threshold
     %folder_path: Path to the folder containing images
 
@@ -48,11 +48,9 @@ function classify_unknown_images(folder_path, threshold)
 
             probabilities = squeeze(cur_layer);
             [max_prob, class_idx] = max(probabilities);
-            if max_prob < threshold
-                fprintf('Image %s classified as UNKNOWN (prob=%.3f)\n', image_files(k).name, max_prob);
-            else
-                fprintf('Image %s classified as class %d (prob=%.3f)\n', image_files(k).name, class_idx, max_prob);
-            end
+            
+            
+            fprintf('Image %s classified as class %d (prob=%.3f)\n', image_files(k).name, class_idx, max_prob);
         catch ME
             fprintf('Error processing image %s: %s\n', image_files(k).name, ME.message);
         end
