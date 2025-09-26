@@ -49,8 +49,9 @@ function classify_unknown_images(folder_path)
             probabilities = squeeze(cur_layer);
             [max_prob, class_idx] = max(probabilities);
             
-            
-            fprintf('Image %s classified as class %d (prob=%.3f)\n', image_files(k).name, class_idx, max_prob);
+            classes = ["airplane", "automobile", 'bird', 'cat', 'dog', 'deer', 'frog', 'horse', 'ship', 'truck'];
+            %fprintf('class_idx is: %d\n', class_idx);
+            fprintf('Image %s classified as class %s (prob=%.3f)\n', image_files(k).name, classes(class_idx), max_prob);
         catch ME
             fprintf('Error processing image %s: %s\n', image_files(k).name, ME.message);
         end
